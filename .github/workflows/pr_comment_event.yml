@@ -35,9 +35,13 @@ jobs:
         env:
           BODY: ${{ github.event.comment.body }}
         run: |
-          STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" -X POST -H "Content-Type: application/json" \
-          -d '{"comment": "${{ env.BODY }}", "repository_url": "${{ env.REPOSITORY_URL}}"}' \
-          ${{ env.CODER_AGENT_WEBHOOK }})
+          { # 'try' block
+            STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" -X POST -H "Content-Type: application/json" \
+            -d '{"comment": "${{ env.BODY }}", "repository_url": "${{ env.REPOSITORY_URL}}"}' \
+            ${{ env.CODER_AGENT_WEBHOOK }})
+          } || { # 'catch' block
+            STATUS_CODE="500"
+          }
           echo "::set-output name=status_code::$STATUS_CODE"        
 
       - name: Get command response
