@@ -55,7 +55,7 @@ jobs:
               owner,
               repo,
               comment_id: context.payload.comment.id,
-              content: "✅",
+              content: "+1",
             });
 
       - name: Command failure
@@ -69,7 +69,7 @@ jobs:
               owner,
               repo,
               comment_id: context.payload.comment.id,
-              content: "❌",
+              content: "-1",
             });          
 
 
