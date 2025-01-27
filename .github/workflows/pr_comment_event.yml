@@ -31,9 +31,9 @@ jobs:
           BODY: ${{ github.event.comment.body }}
       
       - name: Call api for coding
-        if: ${{ startsWith(github.event.comment.body, '/code') }}
+        if: ${{ startsWith(github.event.comment.body, '/generate-code') || startsWith(github.event.comment.body, '/generate-tests') }}
         run: |
-          curl -X POST -H "Content-Type: application/json" \
+          curl -s -X POST -H "Content-Type: application/json" \
           -d '{"comment": "${{ env.BODY }}", "repository_url": "${{ env.REPOSITORY_URL}}"}' \
           ${{ env.CODER_AGENT_WEBHOOK }}
         env:
