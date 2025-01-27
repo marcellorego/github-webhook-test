@@ -47,6 +47,7 @@ jobs:
         if: ${{ steps.request-command.outputs.status_code == '200' }}
         uses: actions/github-script@v4
         with:
+          github-token: ${{ secrets.PAT }}
           script: |
             github.issues.createComment({
               issue_number: context.issue.number,
@@ -59,6 +60,7 @@ jobs:
         if: ${{ steps.request-command.outputs.status_code != '200' }}
         uses: actions/github-script@v4
         with:
+          github-token: ${{ secrets.PAT }}
           script: |
             github.issues.createComment({
               issue_number: context.issue.number,
