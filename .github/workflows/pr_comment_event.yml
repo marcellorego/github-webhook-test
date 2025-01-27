@@ -22,27 +22,26 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
       - name: echo comment
-        run: |
-          echo A comment on PR ${{ env.NUMBER }} and BODY ${{ env.BODY }} for repository ${{ env.REPOSITORY_URL }}
-          echo Webhook push to ${{ env.CODER_AGENT_WEBHOOK }}
         env:
           NUMBER: ${{ github.event.issue.number }}
           BODY: ${{ github.event.comment.body }}
+        run: |
+          echo A comment on PR ${{ env.NUMBER }} and BODY ${{ env.BODY }} for repository ${{ env.REPOSITORY_URL }}
+          echo Webhook push to ${{ env.CODER_AGENT_WEBHOOK }}
       
       - name: Call api to trigger code/tests generation
         id: request-command
         if: ${{ startsWith(github.event.comment.body, '/generate-code') || startsWith(github.event.comment.body, '/generate-tests') }}
+        env:
+          BODY: ${{ github.event.comment.body }}
         run: |
           STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" -X POST -H "Content-Type: application/json" \
           -d '{"comment": "${{ env.BODY }}", "repository_url": "${{ env.REPOSITORY_URL}}"}' \
           ${{ env.CODER_AGENT_WEBHOOK }})
-          echo "::set-output name=status_code::$STATUS_CODE"
-        env:
-          BODY: ${{ github.event.comment.body }}
+          echo "::set-output name=status_code::$STATUS_CODE"        
 
       - name: Get command response
         run: echo "${{steps.request-command.outputs.status_code}}"
-
       
       - name: Command success
         if: ${{ steps.request-command.outputs.status_code == '200' }}
@@ -66,23 +65,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Command failed! ❌',
-            }); 
-
-      # - uses: actions/github-script@v7
-      #   id: my-script
-      #   with:
-      #     result-encoding: string
-      #     retries: 3
-      #     retry-exempt-status-codes: 400,401
-      #     script: |
-      #       return $( \
-      #         curl -s -X POST -H "Content-Type: application/json" \
-      #         -d '{"comment": "${{ env.BODY }}", "repository_url": "${{ env.REPOSITORY_URL}}"}' \
-      #         ${{ env.CODER_AGENT_WEBHOOK }} \
-      #       )
-      #   env:
-      #     BODY: ${{ github.event.comment.body }}
-    
+            });
           
 
 
