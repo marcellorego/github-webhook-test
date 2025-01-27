@@ -1,0 +1,31 @@
+name: Slash Command Dispatch
+
+env:
+  CODER_AGENT_WEBHOOK: ${{ vars.CODER_AGENT_URL }}/api/v1/github-comment
+  REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+
+'on':
+  issue_comment:
+    types:
+      - created
+jobs:
+  slashCommandDispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slash Command Dispatch
+        uses: peter-evans/slash-command-dispatch@v4
+        with:
+          token: '${{ secrets.PAT }}'
+          commands: |
+            code
+            tests
+      - name: Get the target ticket id
+        id: vars
+        run: >
+          ticket=${{ github.event.client_payload.slash_command.args.named.ticket }}
+          echo "ticket=$ticket" >> $GITHUB_OUTPUT
+
+      - name: Get ticket id
+        run: echo "${{ steps.vars.outputs.ticket }}"
+  
+  
