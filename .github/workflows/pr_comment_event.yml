@@ -3,6 +3,7 @@ name: Run on PR comment
 
 env:
   CODER_AGENT_WEBHOOK: ${{ vars.CODER_AGENT_URL }}/api/v1/github-comment
+  REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
 
 on:
   issue_comment:
@@ -28,17 +29,16 @@ jobs:
         env:
           NUMBER: ${{ github.event.issue.number }}
           BODY: ${{ github.event.comment.body }}
-          REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
       
       - name: Call api for coding
         if: ${{ startsWith(github.event.comment.body, '/code') }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d "{\"comment\": \"${{ env.BODY }}\", \"repository_url\": \"${{ env.REPOSITORY_URL}}\"}' \
+          -d '{\"comment\": \"${{ env.BODY }}\", \"repository_url\": \"${{ env.REPOSITORY_URL}}\"}' \
           ${{ env.CODER_AGENT_WEBHOOK }}
         env:
           BODY: ${{ github.event.comment.body }}
-          REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+          
 
 
 
