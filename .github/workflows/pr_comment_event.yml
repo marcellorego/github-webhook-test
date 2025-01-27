@@ -1,6 +1,9 @@
 
 name: Run on PR comment
 
+env:
+  CODER_AGENT_WEBHOOK: ${{ vars.CODER_AGENT_URL }}/api/v1/github-comment
+
 on:
   issue_comment:
     types:
@@ -14,9 +17,14 @@ jobs:
     if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - name: echo comment
         run: |
-          echo A comment on PR $NUMBER and BODY $BODY for repository $REPOSITORY_URL
+          echo A comment on PR ${{ env.NUMBER }} and BODY ${{ env.BODY }} for repository ${{ env.REPOSITORY_URL }}
+          echo Webhook push to ${{ env.CODER_AGENT_WEBHOOK }}
         env:
           NUMBER: ${{ github.event.issue.number }}
           BODY: ${{ github.event.comment.body }}
@@ -26,8 +34,8 @@ jobs:
         if: ${{ startsWith(github.event.comment.body, '/code') }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d "{\"comment\": "$BODY", \"repository_url\": "$REPOSITORY_URL"}' \
-          https://rndxn-78-137-210-16.a.free.pinggy.link/api/v1/github-comment
+          -d "{\"comment\": \"${{ env.BODY }}\", \"repository_url\": \"${{ env.REPOSITORY_URL}}\"}' \
+          ${{ env.CODER_AGENT_WEBHOOK }}
         env:
           BODY: ${{ github.event.comment.body }}
           REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
