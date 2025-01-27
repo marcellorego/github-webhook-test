@@ -30,7 +30,7 @@ jobs:
           NUMBER: ${{ github.event.issue.number }}
           BODY: ${{ github.event.comment.body }}
       
-      - name: Call api for coding
+      - name: Call api to trigger code/tests generation
         if: ${{ startsWith(github.event.comment.body, '/generate-code') || startsWith(github.event.comment.body, '/generate-tests') }}
         run: |
           curl -s -X POST -H "Content-Type: application/json" \
