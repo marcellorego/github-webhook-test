@@ -22,15 +22,15 @@ jobs:
           BODY: ${{ github.event.comment.body }}
           REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
       
-      # - name: Call api for coding
-      #   if: ${{ startsWith(github.event.comment.body, '/code') }}
-      #   run: |
-      #     curl -X POST -H "Content-Type: application/json" \
-      #     -d '{"comment": $BODY, "repository_url": $REPOSITORY_URL}' \
-      #     https://rntup-78-137-210-16.a.free.pinggy.link/api/v1/github-comment
-      #   env:
-      #     BODY: ${{ github.event.comment.body }}
-      #     REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+      - name: Call api for coding
+        if: ${{ startsWith(github.event.comment.body, '/code') }}
+        run: |
+          curl -X POST -H "Content-Type: application/json" \
+          -d '{"comment": $BODY, "repository_url": $REPOSITORY_URL}' \
+          https://rntup-78-137-210-16.a.free.pinggy.link/api/v1/github-comment
+        env:
+          BODY: ${{ github.event.comment.body }}
+          REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
 
 
 
