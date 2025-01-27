@@ -46,10 +46,10 @@ jobs:
           retries: 3
           retry-exempt-status-codes: 400,401
           script: |
-            REPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
-            -d '{"comment": "${{ env.BODY }}", "repository_url": "${{ env.REPOSITORY_URL}}"}' \
-            ${{ env.CODER_AGENT_WEBHOOK }})
-            return REPONSE
+            RESPONSE=$(curl -s -X POST -H "Content-Type: application/json" \
+              -d '{"comment": "${{ env.BODY }}", "repository_url": "${{ env.REPOSITORY_URL}}"}' \
+              ${{ env.CODER_AGENT_WEBHOOK }})
+            return RESPONSE
         env:
           BODY: ${{ github.event.comment.body }}
       
