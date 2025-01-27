@@ -46,7 +46,7 @@ jobs:
       
       - name: Command success
         if: ${{ steps.request-command.outputs.status_code == '200' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v4
         with:
           script: |
             github.issues.createComment({
@@ -58,7 +58,7 @@ jobs:
 
       - name: Command failure
         if: ${{ steps.request-command.outputs.status_code != '200' }}
-        uses: actions/github-script@v7
+        uses: actions/github-script@v4
         with:
           script: |
             github.issues.createComment({
