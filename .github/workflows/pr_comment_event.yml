@@ -34,7 +34,7 @@ jobs:
         if: ${{ startsWith(github.event.comment.body, '/code') }}
         run: |
           curl -X POST -H "Content-Type: application/json" \
-          -d '{\"comment\": \"${{ env.BODY }}\", \"repository_url\": \"${{ env.REPOSITORY_URL}}\"}' \
+          -d '{"comment": "${{ env.BODY }}", "repository_url": "${{ env.REPOSITORY_URL}}"}' \
           ${{ env.CODER_AGENT_WEBHOOK }}
         env:
           BODY: ${{ github.event.comment.body }}
