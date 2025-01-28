@@ -4,6 +4,7 @@ name: Run on PR comment
 env:
   CODER_AGENT_WEBHOOK: ${{ vars.CODER_AGENT_URL }}/api/v1/github-comment
   REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}
+  #{{ secrets.PAT }}
 
 on:
   issue_comment:
@@ -52,7 +53,7 @@ jobs:
         if: ${{ (startsWith(github.event.comment.body, '/generate-code') || startsWith(github.event.comment.body, '/generate-tests')) && steps.request-command.outputs.status_code == '200' }}
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const {owner, repo} = context.issue
             github.rest.reactions.createForIssueComment({
@@ -66,7 +67,7 @@ jobs:
         if: ${{ (startsWith(github.event.comment.body, '/generate-code') || startsWith(github.event.comment.body, '/generate-tests')) && steps.request-command.outputs.status_code != '200' }}
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.PAT }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const {owner, repo} = context.issue
             github.rest.reactions.createForIssueComment({
