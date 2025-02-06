@@ -64,8 +64,7 @@ jobs:
               owner,
               repo,
               comment_id,
-              content: "+1",
-              body: 'Command succeeded! ✅'
+              content: "+1"
             });
 
       - name: Command success comment
@@ -75,12 +74,10 @@ jobs:
           github-token: ${{ secrets.PAT }}
           script: |
             const {owner, repo, number} = context.issue
-            const comment_id = context.payload.comment.id
             github.rest.issues.createComment({
               issue_number: number,
               owner: owner,
               repo: repo,
-              comment_id,
               body: 'Command succeeded! ✅'
             });
 
@@ -96,6 +93,5 @@ jobs:
               owner,
               repo,
               comment_id,
-              content: "-1",
-              body: 'Command failed! ❌'
+              content: "-1"
             });
