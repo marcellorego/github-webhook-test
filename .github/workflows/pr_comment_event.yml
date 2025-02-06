@@ -64,7 +64,8 @@ jobs:
               owner,
               repo,
               comment_id,
-              content: "+1"
+              content: "+1",
+              body: 'Command succeeded! ✅'
             });
 
       - name: Command success comment
@@ -96,4 +97,5 @@ jobs:
               repo,
               comment_id,
               content: "-1",
+              body: 'Command failed! ❌'
             });
