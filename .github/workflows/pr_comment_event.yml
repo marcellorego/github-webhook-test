@@ -1,4 +1,3 @@
-
 name: Run on PR comment
 
 env:
@@ -8,7 +7,7 @@ env:
 on:
   issue_comment:
     types:
-    - created
+      - created
 
 jobs:
   pr_commented:
@@ -21,6 +20,7 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
+
       - name: echo comment
         env:
           NUMBER: ${{ github.event.issue.number }}
@@ -28,26 +28,30 @@ jobs:
         run: |
           echo A comment on PR ${{ env.NUMBER }} and BODY ${{ env.BODY }} for repository ${{ env.REPOSITORY_URL }}
           echo Webhook push to ${{ env.CODER_AGENT_WEBHOOK }}
-      
+
+      # Emulates a call to Coder Agent to trigger below commands
+      # Sets the response code = 200 (success)
       - name: Call api to trigger code/tests generation
         id: request-command
         if: ${{ startsWith(github.event.comment.body, '/generate-code') || startsWith(github.event.comment.body, '/generate-tests') }}
         env:
           BODY: ${{ github.event.comment.body }}
         run: |
-          { # 'try' block
-            STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" -X POST -H "Content-Type: application/json" \
-            -d '{"comment": "${{ env.BODY }}", "repository_url": "${{ env.REPOSITORY_URL}}"}' \
-            ${{ env.CODER_AGENT_WEBHOOK }})
-          } || { # 'catch' block
-            STATUS_CODE="500"
-          }
-          echo "::set-output name=status_code::$STATUS_CODE"        
+          STATUS_CODE="200"
+          echo "::set-output name=status_code::$STATUS_CODE"
+      #          { # 'try' block
+      #            STATUS_CODE=$(curl -o /dev/null -s -w "%{http_code}" -X POST -H "Content-Type: application/json" \
+      #            -d '{"comment": "${{ env.BODY }}", "repository_url": "${{ env.REPOSITORY_URL}}"}' \
+      #            ${{ env.CODER_AGENT_WEBHOOK }})
+      #          } || { # 'catch' block
+      #            STATUS_CODE="500"
+      #          }
+
 
       - name: Get command response
         if: ${{ startsWith(github.event.comment.body, '/generate-code') || startsWith(github.event.comment.body, '/generate-tests') }}
         run: echo "${{steps.request-command.outputs.status_code}}"
-      
+
       - name: Command success
         if: ${{ (startsWith(github.event.comment.body, '/generate-code') || startsWith(github.event.comment.body, '/generate-tests')) && steps.request-command.outputs.status_code == '200' }}
         uses: actions/github-script@v7
@@ -55,12 +59,29 @@ jobs:
           github-token: ${{ secrets.PAT }}
           script: |
             const {owner, repo} = context.issue
+            const {comment_id}: context.payload.comment.id
             github.rest.reactions.createForIssueComment({
               owner,
               repo,
-              comment_id: context.payload.comment.id,
+              comment_id,
               content: "+1",
+              body: 'Command succeeded! ✅'
             });
+
+      #      - name: Command success comment
+      #        if: ${{ (startsWith(github.event.comment.body, '/generate-code') || startsWith(github.event.comment.body, '/generate-tests')) && steps.request-command.outputs.status_code == '200' }}
+      #        uses: actions/github-script@v7
+      #        with:
+      #          github-token: ${{ secrets.PAT }}
+      #          script: |
+      #            const {owner, repo, number} = context.issue
+      #            const {comment_id}: context.payload.comment.id
+      #            github.rest.issues.createComment({
+      #                issue_number: number,
+      #                owner: owner,
+      #                repo: repo,
+      #                body: 'Command succeeded! ✅'
+      #            });
 
       - name: Command failure
         if: ${{ (startsWith(github.event.comment.body, '/generate-code') || startsWith(github.event.comment.body, '/generate-tests')) && steps.request-command.outputs.status_code != '200' }}
@@ -69,13 +90,11 @@ jobs:
           github-token: ${{ secrets.PAT }}
           script: |
             const {owner, repo} = context.issue
+            const {comment_id}: context.payload.comment.id
             github.rest.reactions.createForIssueComment({
               owner,
               repo,
-              comment_id: context.payload.comment.id,
+              comment_id,
+              body: Command failed! ❌
               content: "-1",
-            });          
-
-
-
-        
+            });
