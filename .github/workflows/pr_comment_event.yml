@@ -59,7 +59,7 @@ jobs:
           github-token: ${{ secrets.PAT }}
           script: |
             const {owner, repo} = context.issue
-            const {comment_id}: context.payload.comment.id
+            const {comment_id} = context.payload.comment.id
             github.rest.reactions.createForIssueComment({
               owner,
               repo,
@@ -75,7 +75,7 @@ jobs:
       #          github-token: ${{ secrets.PAT }}
       #          script: |
       #            const {owner, repo, number} = context.issue
-      #            const {comment_id}: context.payload.comment.id
+      #            const {comment_id} = context.payload.comment.id
       #            github.rest.issues.createComment({
       #                issue_number: number,
       #                owner: owner,
@@ -90,7 +90,7 @@ jobs:
           github-token: ${{ secrets.PAT }}
           script: |
             const {owner, repo} = context.issue
-            const {comment_id}: context.payload.comment.id
+            const {comment_id} = context.payload.comment.id
             github.rest.reactions.createForIssueComment({
               owner,
               repo,
