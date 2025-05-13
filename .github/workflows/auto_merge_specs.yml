@@ -1,0 +1,36 @@
+name: Auto Merge Specs After Approval
+
+on:
+  pull_request_review:
+    branches:
+      - 'feature/*'
+    types:
+      - submitted
+
+jobs:
+  auto-merge-specs:
+    runs-on: ubuntu-latest
+    # This workflow is disabled for now
+    if: ${{ false && (github.event.review.state == 'approved') }} 
+    steps:
+      - name: Show PR branch info
+        run: |
+          echo "Source branch: ${{ github.event.pull_request.head.ref }}"
+          echo "Target branch: ${{ github.event.pull_request.base.ref }}"
+          echo "Review state: ${{ github.event.review.state }}"
+          echo "PR number: ${{ github.event.pull_request.number }}"
+
+      - name: Check if this is a specs PR
+        id: check_pr
+        run: echo "IS_SPECS_BRANCH=$(echo ${{ github.event.pull_request.head.ref }} | grep -i 'feature/' | grep -ic '\-specs$')" >> $GITHUB_OUTPUT
+
+      - name: Auto Merge If Approved
+        if: steps.check_pr.outputs.IS_SPECS_BRANCH == '1'
+        uses: pascalgn/automerge-action@v0.16.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MERGE_LABELS: "automerge,specs"
+          MERGE_METHOD: "squash"
+          MERGE_REQUIRED_APPROVALS: "1"
+          PULL_REQUEST: ${{ github.event.pull_request.number }}
+          BASE_BRANCHES: ${{ github.event.pull_request.base.ref }}
